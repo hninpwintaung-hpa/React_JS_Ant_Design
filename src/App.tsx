@@ -1,52 +1,46 @@
-import { GitHubBanner, Refine, WelcomePage } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
-import { useNotificationProvider } from "@refinedev/antd";
-import "@refinedev/antd/dist/reset.css";
-
-import routerBindings, {
-  DocumentTitleHandler,
+import { ThemedLayoutV2 } from "@refinedev/antd";
+import { Refine } from "@refinedev/core";
+import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import UserList from "./pages/UserList";
+import UserCreate from "./pages/UserCreate";
+import UserEdit from "./pages/UserEdit";
+import routerProvider, {
+  NavigateToResource,
   UnsavedChangesNotifier,
+  DocumentTitleHandler,
 } from "@refinedev/react-router-v6";
-import dataProvider from "@refinedev/simple-rest";
-import { App as AntdApp } from "antd";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { ColorModeContextProvider } from "./contexts/color-mode";
 
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
-      <RefineKbarProvider>
-        <ColorModeContextProvider>
-          <AntdApp>
-            <DevtoolsProvider>
-              <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
-                notificationProvider={useNotificationProvider}
-                routerProvider={routerBindings}
-                options={{
-                  syncWithLocation: true,
-                  warnWhenUnsavedChanges: true,
-                  useNewQueryKeys: true,
-                  projectId: "zDlfCN-bqmb1u-9WqFV3",
-                }}
-              >
-                <Routes>
-                  <Route index element={<WelcomePage />} />
-                </Routes>
-                <RefineKbar />
-                <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
-              </Refine>
-              <DevtoolsPanel />
-            </DevtoolsProvider>
-          </AntdApp>
-        </ColorModeContextProvider>
-      </RefineKbarProvider>
+      <Refine
+        resources={[
+          {
+            name: "users",
+            list: "users/list",
+            create: "users/create",
+            edit: "users/edit/:id",
+          },
+        ]}
+      >
+      <Routes>
+        <Route
+          element={
+            <ThemedLayoutV2>
+              <Outlet />
+            </ThemedLayoutV2>
+          }
+        >
+          <Route index element={<NavigateToResource resource="users" />} />
+          <Route path = "users">
+          <Route index element={<UserList/>}/>
+          <Route path="create" element={<UserCreate/>}/>
+          <Route path="edit/:id" element={<UserEdit/>}/>
+          </Route>
+        </Route>
+      </Routes>
+      </Refine>
     </BrowserRouter>
   );
 }
-
 export default App;
